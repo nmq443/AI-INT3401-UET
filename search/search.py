@@ -141,7 +141,7 @@ def breadthFirstSearch(problem: SearchProblem):
 
         for successor in problem.getSuccessors(currentState):
             nextState, act, _cost = successor
-            if nextState not in visited.keys():
+            if nextState not in visited.keys() and nextState not in route.keys():
                 queue.push((nextState, act, _cost))
                 route[nextState] = currentState
 
@@ -157,7 +157,41 @@ def breadthFirstSearch(problem: SearchProblem):
 def uniformCostSearch(problem: SearchProblem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    solution = []
+    startState = problem.getStartState()
+    visited = {} # visited[v] = action means to get to v you need to make action 
+    route = {} # route[v] = u means v is child of u
+    total_cost = {}
+    total_cost[startState] = 0
+
+    child = None
+    queue = util.PriorityQueue()
+    queue.push((startState, '', 0), 0)
+    while not queue.isEmpty():
+        currentState, action, cost = queue.pop()
+
+        if problem.isGoalState(currentState):
+            child = currentState
+            visited[child] = action
+            break
+
+        visited[currentState] = action 
+
+        for successor in problem.getSuccessors(currentState):
+            nextState, act, _cost = successor
+            priority = total_cost[currentState] + _cost
+            if nextState not in visited.keys() and (nextState not in total_cost.keys() or total_cost[nextState] > total_cost[currentState] + _cost):
+                queue.push((nextState, act, _cost), priority)
+                total_cost[nextState] = total_cost[currentState] + _cost
+                route[nextState] = currentState
+
+    while child in route.keys():
+        parent = route[child]
+        solution.append(visited[child])
+        child = parent
+
+    solution.reverse()
+    return solution
 
 def nullHeuristic(state, problem=None):
     """
@@ -169,7 +203,42 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    solution = []
+    startState = problem.getStartState()
+    visited = {} # visited[v] = action means to get to v you need to make action 
+    route = {} # route[v] = u means v is child of u
+    total_cost = {}
+    total_cost[startState] = 0
+
+    child = None
+    queue = util.PriorityQueue()
+    queue.push((startState, '', 0), 0)
+    while not queue.isEmpty():
+        currentState, action, cost = queue.pop()
+
+        if problem.isGoalState(currentState):
+            child = currentState
+            visited[child] = action
+            break
+
+        visited[currentState] = action 
+
+        for successor in problem.getSuccessors(currentState):
+            nextState, act, _cost = successor
+            priority = total_cost[currentState] + _cost + heuristic(nextState, problem)
+            if nextState not in visited.keys() and (nextState not in total_cost.keys() or total_cost[nextState] > total_cost[currentState] + _cost + heuristic(nextState, problem)):
+                queue.push((nextState, act, _cost), priority)
+                total_cost[nextState] = total_cost[currentState] + _cost
+                route[nextState] = currentState
+
+    while child in route.keys():
+        parent = route[child]
+        solution.append(visited[child])
+        child = parent
+
+    solution.reverse()
+    return solution
+
 
 
 # Abbreviations
