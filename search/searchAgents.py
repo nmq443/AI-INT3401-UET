@@ -372,13 +372,14 @@ def cornersHeuristic(state: Any, problem: CornersProblem):
     if problem.isGoalState(state):
         return 0
     heuristic = []
-    def euclideanDistance(xy1, xy2):
-        return ((xy1[0] - xy2[0])**2 + (xy1[1] - xy2[1])**2)**0.5
     for corner in state[1]:
         heuristic.append(util.manhattanDistance(corner, state[0]))
     if len(heuristic) == 0:
         return 0
     return max(heuristic)
+
+def euclideanDistance(xy1, xy2):
+        return ((xy1[0] - xy2[0])**2 + (xy1[1] - xy2[1])**2)**0.5
 
 
 class AStarCornersAgent(SearchAgent):
@@ -472,8 +473,16 @@ def foodHeuristic(state: Tuple[Tuple, List[List]], problem: FoodSearchProblem):
     problem.heuristicInfo['wallCount']
     """
     position, foodGrid = state
+    foodGrid = foodGrid.asList()
     "*** YOUR CODE HERE ***"
-    return 0
+    if problem.isGoalState(state):
+        return 0
+    heuristic = []
+    for food in foodGrid:
+        heuristic.append(util.manhattanDistance(food, position))
+        #heuristic.append(euclideanDistance(food, position))
+    return max(heuristic)
+    
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
@@ -504,7 +513,9 @@ class ClosestDotSearchAgent(SearchAgent):
         problem = AnyFoodSearchProblem(gameState)
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return search.aStarSearch(problem)            
+
+
 
 class AnyFoodSearchProblem(PositionSearchProblem):
     """
@@ -537,9 +548,11 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         The state is Pacman's position. Fill this in with a goal test that will
         complete the problem definition.
         """
-        x,y = state
+        x, y = state
+        return self.food[x][y]
 
         "*** YOUR CODE HERE ***"
+
         util.raiseNotDefined()
 
 def mazeDistance(point1: Tuple[int, int], point2: Tuple[int, int], gameState: pacman.GameState) -> int:
